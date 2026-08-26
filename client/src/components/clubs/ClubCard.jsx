@@ -7,10 +7,9 @@ import Badge from '../common/Badge';
 import Button from '../common/Button';
 import { Users, CheckCircle, ArrowUpRight, Sparkles } from 'lucide-react';
 
-export default function ClubCard({ club, onClubUpdated }) {
-  const { user, isAuthenticated, isStudent, updateUserProfile } = useAuth();
+export default function ClubCard({ club, onClubUpdated, compact = false }) {
+  const { user, isAuthenticated, updateUserProfile } = useAuth();
   const { showToast } = useAlert();
-
   const isMember = user?.joinedClubs?.includes(club._id);
 
   const handleJoin = async (e) => {
@@ -30,7 +29,7 @@ export default function ClubCard({ club, onClubUpdated }) {
       } else {
         const res = await clubService.joinClub(club._id, user);
         if (res.user) updateUserProfile(res.user);
-        showToast(`🎉 You have joined ${club.name}!`, 'success');
+        showToast(`You have joined ${club.name}!`, 'success');
       }
       if (onClubUpdated) onClubUpdated();
     } catch (err) {
@@ -42,84 +41,138 @@ export default function ClubCard({ club, onClubUpdated }) {
     switch (cat) {
       case 'Technical':
         return 'primary';
-      case 'Cultural':
+      case 'Theatre':
+      case 'Dance':
+      case 'Singing':
         return 'purple';
       case 'Sports':
         return 'success';
-      case 'Arts':
-        return 'cyan';
+      case 'Art and Craft':
+      case 'Content Creation':
+      case 'Film Making':
+      case 'Cooking':
+        return 'accent';
+      case 'Entrepreneurship':
+      case 'LinkedIn Club':
+      case 'Placement':
+        return 'info';
+      case 'Literature':
+      case 'Poetry':
+        return 'warning';
+      case 'Health':
+      case 'Wellness':
+      case 'Hostel Committee':
+      case 'Day Scholar':
       default:
         return 'default';
     }
   };
 
+  if (compact) {
+    return (
+      <div className="bg-white rounded-lg border border-slate-200 p-4 flex flex-col gap-3 hover:border-slate-300 card-hover">
+        <div className="flex items-start gap-3">
+          <div className="w-11 h-11 rounded bg-slate-50 border border-slate-200 flex items-center justify-center text-xl flex-shrink-0">
+            {club.logo || '🎓'}
+          </div>
+          <div className="min-w-0 flex-1">
+            <h3 className="text-sm font-semibold text-slate-900 truncate hover:text-[#1e3a5f] transition-colors">
+              {club.name}
+            </h3>
+            <div className="mt-0.5 flex items-center gap-2 flex-wrap">
+              <Badge variant={getCategoryVariant(club.category)} size="sm">
+                {club.category}
+              </Badge>
+              <span className="text-[11px] text-slate-500 flex items-center gap-1">
+                <Users className="w-3 h-3" />
+                {club.membersCount || 0}
+              </span>
+            </div>
+          </div>
+        </div>
+        <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed">
+          {club.tagline}
+        </p>
+        <div className="flex items-center justify-between pt-2 mt-auto">
+          <Link
+            to={`/clubs/${club._id}`}
+            className="text-xs font-medium text-[#1e3a5f] hover:underline flex items-center gap-1"
+          >
+            View Club <ArrowUpRight className="w-3 h-3" />
+          </Link>
+          <Button
+            size="sm"
+            variant={isMember ? 'success' : 'outline'}
+            onClick={handleJoin}
+          >
+            {isMember ? 'Joined' : 'Join'}
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="bg-white rounded-2xl border border-slate-200/90 shadow-sm overflow-hidden flex flex-col transition-all duration-200 hover:-translate-y-1 hover:shadow-lg hover:border-slate-300 group">
-      {/* Club Banner Header */}
-      <div className="relative h-44 w-full overflow-hidden bg-slate-100">
+    <div className="bg-white rounded-lg border border-slate-200 overflow-hidden flex flex-col hover:border-slate-300 card-hover group">
+      <div className="relative h-32 w-full overflow-hidden bg-slate-100">
         <img
           src={club.bannerImage}
           alt={club.name}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          className="w-full h-full object-cover"
+          loading="lazy"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20" />
-        
-        {/* Category Pill */}
-        <div className="absolute top-3 left-3">
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/55 via-slate-900/10 to-transparent" />
+
+        <div className="absolute top-2.5 left-2.5">
           <Badge variant={getCategoryVariant(club.category)} size="sm">
             {club.category}
           </Badge>
         </div>
 
-        {/* Members Count Badge */}
-        <div className="absolute top-3 right-3 bg-black/50 backdrop-blur-md text-white px-2.5 py-1 rounded-full text-xs font-medium flex items-center gap-1.5 border border-white/20">
-          <Users className="w-3.5 h-3.5" />
-          <span>{club.membersCount || 0} Members</span>
+        <div className="absolute top-2.5 right-2.5 bg-white/95 text-slate-700 px-2 py-0.5 rounded text-[11px] font-medium flex items-center gap-1.5 border border-slate-200">
+          <Users className="w-3 h-3 text-[#1e3a5f]" />
+          <span>{club.membersCount || 0}</span>
         </div>
 
-        {/* Club Logo Floating Avatar */}
-        <div className="absolute -bottom-3 left-5 w-12 h-12 bg-white rounded-2xl shadow-md border border-slate-100 flex items-center justify-center text-2xl">
+        <div className="absolute -bottom-4 left-4 w-11 h-11 bg-white rounded border border-slate-200 flex items-center justify-center text-xl">
           {club.logo || '🎓'}
         </div>
       </div>
 
-      {/* Content Area */}
-      <div className="p-5 pt-6 flex-1 flex flex-col justify-between">
+      <div className="p-4 pt-6 flex-1 flex flex-col justify-between">
         <div>
-          <h3 className="text-base font-bold text-slate-900 line-clamp-1 group-hover:text-indigo-600 transition-colors">
+          <h3 className="text-sm font-semibold text-slate-900 line-clamp-1 group-hover:text-[#1e3a5f] transition-colors">
             {club.name}
           </h3>
-          <p className="text-xs text-slate-500 mt-1.5 line-clamp-2 leading-relaxed">
+          <p className="text-xs text-slate-500 mt-1 line-clamp-2 leading-relaxed">
             {club.tagline || club.description}
           </p>
 
-          {/* Tags */}
           {club.tags && club.tags.length > 0 && (
-            <div className="flex flex-wrap gap-1.5 mt-3">
+            <div className="flex flex-wrap gap-1 mt-3">
               {club.tags.slice(0, 3).map((tag, idx) => (
                 <span
                   key={idx}
-                  className="text-[11px] px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 font-medium"
+                  className="text-[11px] px-2 py-0.5 rounded bg-slate-50 text-slate-600 border border-slate-200"
                 >
-                  #{tag}
+                  {tag}
                 </span>
               ))}
             </div>
           )}
         </div>
 
-        {/* Footer & Actions */}
-        <div className="mt-5 pt-4 border-t border-slate-100 flex items-center justify-between gap-3">
+        <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between gap-3">
           <Link
             to={`/clubs/${club._id}`}
-            className="text-xs font-bold text-slate-700 hover:text-indigo-600 flex items-center gap-1 transition-colors"
+            className="text-xs font-medium text-slate-600 hover:text-[#1e3a5f] flex items-center gap-1 transition-colors"
           >
-            Details <ArrowUpRight className="w-3.5 h-3.5" />
+            View Club <ArrowUpRight className="w-3.5 h-3.5" />
           </Link>
 
           <Button
             size="sm"
-            variant={isMember ? 'success' : 'secondary'}
+            variant={isMember ? 'success' : 'primary'}
             icon={isMember ? CheckCircle : Sparkles}
             onClick={handleJoin}
           >

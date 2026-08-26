@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { STORAGE_KEYS } from '../utils/constants';
+import { DATA_SEED_VERSION, STORAGE_KEYS } from '../utils/constants';
 import {
   INITIAL_CLUBS,
   INITIAL_EVENTS,
@@ -7,20 +7,41 @@ import {
   INITIAL_REGISTRATIONS,
 } from '../data/initialData';
 
-// Initialize localStorage with realistic mock data if not already seeded
+function storedClubsNeedReseed() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEYS.CLUBS);
+    if (!raw) return true;
+    const stored = JSON.parse(raw);
+    if (!Array.isArray(stored) || stored.length !== INITIAL_CLUBS.length) return true;
+    const officialNames = new Set(INITIAL_CLUBS.map((club) => club.name));
+    const officialIds = new Set(INITIAL_CLUBS.map((club) => club._id));
+    return stored.some((club) => !officialIds.has(club._id) || !officialNames.has(club.name));
+  } catch {
+    return true;
+  }
+}
+
+// Seed localStorage from initialData. Re-seed when the version changes or stale club names remain.
 export function initMockStorage() {
-  if (!localStorage.getItem(STORAGE_KEYS.CLUBS)) {
+  const storedVersion = localStorage.getItem(STORAGE_KEYS.DATA_VERSION);
+  const versionMismatch = storedVersion !== DATA_SEED_VERSION;
+  const reseedClubs = versionMismatch || storedClubsNeedReseed();
+  const reseedAll = versionMismatch;
+
+  if (reseedClubs) {
     localStorage.setItem(STORAGE_KEYS.CLUBS, JSON.stringify(INITIAL_CLUBS));
   }
-  if (!localStorage.getItem(STORAGE_KEYS.EVENTS)) {
+  if (reseedAll || !localStorage.getItem(STORAGE_KEYS.EVENTS)) {
     localStorage.setItem(STORAGE_KEYS.EVENTS, JSON.stringify(INITIAL_EVENTS));
   }
-  if (!localStorage.getItem(STORAGE_KEYS.ANNOUNCEMENTS)) {
+  if (reseedAll || !localStorage.getItem(STORAGE_KEYS.ANNOUNCEMENTS)) {
     localStorage.setItem(STORAGE_KEYS.ANNOUNCEMENTS, JSON.stringify(INITIAL_ANNOUNCEMENTS));
   }
-  if (!localStorage.getItem(STORAGE_KEYS.REGISTRATIONS)) {
+  if (reseedAll || !localStorage.getItem(STORAGE_KEYS.REGISTRATIONS)) {
     localStorage.setItem(STORAGE_KEYS.REGISTRATIONS, JSON.stringify(INITIAL_REGISTRATIONS));
   }
+
+  localStorage.setItem(STORAGE_KEYS.DATA_VERSION, DATA_SEED_VERSION);
 }
 
 // Initialize immediately

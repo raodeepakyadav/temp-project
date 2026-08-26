@@ -5,32 +5,35 @@ import Button from '../common/Button';
 import { useAlert } from '../../hooks/useAlert';
 import { eventService } from '../../services/eventService';
 import { clubService } from '../../services/clubService';
-import { CLUB_CATEGORIES } from '../../utils/constants';
+import { EVENT_CATEGORIES } from '../../utils/constants';
 
+const INITIAL_EVENT_FORM = {
+  title: '',
+  clubId: '',
+  clubName: '',
+  category: 'Technical',
+  shortDescription: '',
+  description: '',
+  date: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7).toISOString().split('T')[0],
+  time: '10:00 AM',
+  venue: '',
+  capacity: 100,
+  fee: 'Free',
+  speaker: '',
+  requirements: 'Student ID Card, Laptop',
+  bannerImage: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&auto=format&fit=crop&q=80',
+  tags: 'Hackathon, Campus',
+};
+
+/**
+ * EventFormModal provides an administrative form to publish new events
+ * or update existing event schedules, fees, venues, and capacity limits.
+ */
 export default function EventFormModal({ isOpen, onClose, eventToEdit, onSaved }) {
   const { showToast } = useAlert();
   const [loading, setLoading] = useState(false);
   const [clubs, setClubs] = useState([]);
-
-  const initialForm = {
-    title: '',
-    clubId: '',
-    clubName: '',
-    category: 'Technical',
-    shortDescription: '',
-    description: '',
-    date: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7).toISOString().split('T')[0],
-    time: '10:00 AM',
-    venue: '',
-    capacity: 100,
-    fee: 'Free',
-    speaker: '',
-    requirements: 'Student ID Card, Laptop',
-    bannerImage: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&auto=format&fit=crop&q=80',
-    tags: 'Hackathon, Campus',
-  };
-
-  const [formData, setFormData] = useState(initialForm);
+  const [formData, setFormData] = useState(INITIAL_EVENT_FORM);
 
   useEffect(() => {
     const loadClubs = async () => {
@@ -45,7 +48,7 @@ export default function EventFormModal({ isOpen, onClose, eventToEdit, onSaved }
           }));
         }
       } catch (e) {
-        console.error(e);
+        console.error('Error fetching clubs for event scheduling', e);
       }
     };
     if (isOpen) loadClubs();
@@ -61,7 +64,7 @@ export default function EventFormModal({ isOpen, onClose, eventToEdit, onSaved }
         tags: Array.isArray(eventToEdit.tags) ? eventToEdit.tags.join(', ') : eventToEdit.tags || '',
       });
     } else {
-      setFormData(initialForm);
+      setFormData(INITIAL_EVENT_FORM);
     }
   }, [eventToEdit, isOpen]);
 
@@ -118,7 +121,7 @@ export default function EventFormModal({ isOpen, onClose, eventToEdit, onSaved }
     }
   };
 
-  const categoryOptions = CLUB_CATEGORIES.filter((c) => c !== 'All');
+  const categoryOptions = EVENT_CATEGORIES.filter((c) => c !== 'All');
 
   return (
     <Modal

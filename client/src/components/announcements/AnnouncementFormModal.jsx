@@ -105,7 +105,7 @@ export default function AnnouncementFormModal({ isOpen, onClose, onSaved }) {
         <Input
           label="Issuer / Author Name"
           name="author"
-          placeholder="e.g. Office of Dean / ByteCraft Core"
+          placeholder="e.g. Office of Dean / TeChitkara Core"
           value={formData.author}
           onChange={handleChange}
         />
@@ -121,16 +121,19 @@ export default function AnnouncementFormModal({ isOpen, onClose, onSaved }) {
           required
         />
 
-        <div className="flex items-center gap-2 pt-1">
+        <div className="flex items-center gap-2.5 pt-1">
           <input
             id="isPinned"
             name="isPinned"
             type="checkbox"
             checked={formData.isPinned}
             onChange={handleChange}
-            className="w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+            className="w-4 h-4 rounded border-slate-300 bg-white text-[#1e3a5f] focus:ring-[#1e3a5f] focus:ring-offset-white cursor-pointer"
           />
-          <label htmlFor="isPinned" className="text-xs font-semibold text-slate-700 cursor-pointer">
+          <label
+            htmlFor="isPinned"
+            className="text-xs font-semibold text-slate-700 cursor-pointer"
+          >
             Pin this announcement to top of feed
           </label>
         </div>

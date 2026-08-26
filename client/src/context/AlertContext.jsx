@@ -1,18 +1,23 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle2, AlertTriangle, XCircle, Info, X } from 'lucide-react';
 
+/**
+ * AlertContext provides global toast notifications across all pages and components.
+ * Useful for showing feedback when users login, join clubs, register for events, etc.
+ */
 const AlertContext = createContext(null);
 
 export const AlertProvider = ({ children }) => {
   const [toasts, setToasts] = useState([]);
 
+  // Dismiss a specific toast notification by its unique ID
   const hideToast = useCallback((id) => {
     setToasts((prev) => prev.filter((t) => t.id !== id));
   }, []);
 
+  // Display a new toast notification with an auto-dismiss timer
   const showToast = useCallback((message, type = 'info', duration = 4000) => {
-    const id = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    const id = `${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
     const newToast = { id, message, type, duration };
 
     setToasts((prev) => [...prev, newToast]);
@@ -25,52 +30,49 @@ export const AlertProvider = ({ children }) => {
   }, [hideToast]);
 
   const icons = {
-    success: <CheckCircle2 className="w-5 h-5 text-emerald-600 flex-shrink-0" />,
-    error: <XCircle className="w-5 h-5 text-rose-600 flex-shrink-0" />,
-    warning: <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0" />,
-    info: <Info className="w-5 h-5 text-indigo-600 flex-shrink-0" />,
+    success: <CheckCircle2 className="w-5 h-5 text-emerald-400 flex-shrink-0" />,
+    error: <XCircle className="w-5 h-5 text-red-400 flex-shrink-0" />,
+    warning: <AlertTriangle className="w-5 h-5 text-amber-400 flex-shrink-0" />,
+    info: <Info className="w-5 h-5 text-blue-400 flex-shrink-0" />,
   };
 
   const bgStyles = {
-    success: 'bg-white border-emerald-200 text-slate-800 shadow-lg shadow-emerald-500/10',
-    error: 'bg-white border-rose-200 text-slate-800 shadow-lg shadow-rose-500/10',
-    warning: 'bg-white border-amber-200 text-slate-800 shadow-lg shadow-amber-500/10',
-    info: 'bg-white border-indigo-200 text-slate-800 shadow-lg shadow-indigo-500/10',
+    success: 'bg-zinc-900 border-emerald-800/70 text-zinc-100 shadow-xl',
+    error: 'bg-zinc-900 border-red-800/70 text-zinc-100 shadow-xl',
+    warning: 'bg-zinc-900 border-amber-800/70 text-zinc-100 shadow-xl',
+    info: 'bg-zinc-900 border-zinc-700 text-zinc-100 shadow-xl',
   };
 
   return (
     <AlertContext.Provider value={{ showToast, hideToast }}>
       {children}
-      {/* Toast Notification Container */}
+      {/* Toast Notification Container positioned at bottom-right */}
       <div className="fixed bottom-5 right-5 z-50 flex flex-col gap-2 max-w-md w-full pointer-events-none px-4 sm:px-0">
-        <AnimatePresence>
-          {toasts.map((toast) => (
-            <motion.div
-              key={toast.id}
-              initial={{ opacity: 0, y: 20, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 10, scale: 0.95 }}
-              transition={{ duration: 0.2 }}
-              className={`pointer-events-auto flex items-center justify-between gap-3 p-4 rounded-xl border ${bgStyles[toast.type] || bgStyles.info}`}
+        {toasts.map((toast) => (
+          <div
+            key={toast.id}
+            className={`pointer-events-auto flex items-center justify-between gap-3 p-4 rounded-xl border transition-all duration-200 animate-in fade-in slide-in-from-bottom-2 ${bgStyles[toast.type] || bgStyles.info}`}
+          >
+            <div className="flex items-center gap-3">
+              {icons[toast.type] || icons.info}
+              <p className="text-sm font-medium text-white">{toast.message}</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => hideToast(toast.id)}
+              className="text-zinc-500 hover:text-zinc-200 p-1 rounded-lg hover:bg-zinc-800 transition-colors cursor-pointer"
+              title="Close alert"
             >
-              <div className="flex items-center gap-3">
-                {icons[toast.type] || icons.info}
-                <p className="text-sm font-medium">{toast.message}</p>
-              </div>
-              <button
-                onClick={() => hideToast(toast.id)}
-                className="text-slate-400 hover:text-slate-600 p-1 rounded-lg transition-colors"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </motion.div>
-          ))}
-        </AnimatePresence>
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        ))}
       </div>
     </AlertContext.Provider>
   );
 };
 
+// Custom hook to consume alert context in components
 export const useAlert = () => {
   const context = useContext(AlertContext);
   if (!context) {

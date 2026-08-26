@@ -15,25 +15,27 @@ export default function Button({
   ...props
 }) {
   const baseStyles =
-    'inline-flex items-center justify-center font-medium rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer active:scale-[0.98]';
+    'inline-flex items-center justify-center font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-offset-1 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer';
 
   const sizeStyles = {
     sm: 'text-xs px-3 py-1.5 gap-1.5',
-    md: 'text-sm px-4 py-2.5 gap-2',
-    lg: 'text-base px-6 py-3 gap-2.5 font-semibold',
+    md: 'text-sm px-4 py-2 gap-2',
+    lg: 'text-sm px-5 py-2.5 gap-2.5 font-medium',
   };
 
   const variantStyles = {
     primary:
-      'bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm shadow-indigo-500/20 focus:ring-indigo-500 border border-transparent',
+      'bg-[#1e3a5f] hover:bg-[#152a45] text-white focus:ring-[#1e3a5f]/30 border border-[#1e3a5f]/20',
     secondary:
-      'bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200/80 focus:ring-slate-400',
+      'bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 focus:ring-slate-300',
     outline:
-      'bg-transparent hover:bg-slate-50 text-slate-700 border border-slate-300 focus:ring-indigo-500',
+      'bg-transparent hover:bg-slate-50 text-slate-700 border border-slate-300 focus:ring-slate-300',
+    accent:
+      'bg-[#8b6914] hover:bg-[#6e5310] text-white focus:ring-[#8b6914]/30 border border-[#8b6914]/20',
     danger:
-      'bg-rose-600 hover:bg-rose-700 text-white shadow-sm shadow-rose-500/20 focus:ring-rose-500 border border-transparent',
+      'bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 focus:ring-red-300',
     success:
-      'bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm shadow-emerald-500/20 focus:ring-emerald-500 border border-transparent',
+      'bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 focus:ring-emerald-300',
     ghost:
       'bg-transparent hover:bg-slate-100 text-slate-600 hover:text-slate-900 border border-transparent focus:ring-slate-300',
   };

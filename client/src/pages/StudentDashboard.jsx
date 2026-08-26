@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
-import { useAlert } from '../hooks/useAlert';
 import { clubService } from '../services/clubService';
 import { eventService } from '../services/eventService';
 import Sidebar from '../components/common/Sidebar';
@@ -13,32 +12,35 @@ import AnnouncementList from '../components/announcements/AnnouncementList';
 import Button from '../components/common/Button';
 import Badge from '../components/common/Badge';
 import {
-  GraduationCap,
   Users,
   Calendar,
   Ticket,
   Bell,
   QrCode,
   ArrowRight,
-  Sparkles,
   Compass,
 } from 'lucide-react';
 import { formatDate, formatTime } from '../utils/formatDate';
 
+/**
+ * StudentDashboard provides students with tabs to view:
+ * 1. Overview KPI statistics (Joined clubs count, event passes, notices)
+ * 2. My Subscribed Clubs (manage joined clubs)
+ * 3. My Event Passes (view and display QR admission badges)
+ * 4. Campus Bulletins & Announcements
+ */
 export default function StudentDashboard() {
   const { user } = useAuth();
-  const { showToast } = useAlert();
 
   const [activeTab, setActiveTab] = useState('overview');
   const [joinedClubsList, setJoinedClubsList] = useState([]);
   const [myRegistrations, setMyRegistrations] = useState([]);
   const [selectedTicket, setSelectedTicket] = useState(null);
   const [ticketModalOpen, setTicketModalOpen] = useState(false);
-  const [loading, setLoading] = useState(true);
 
-  const loadUserData = async () => {
+  // Load student's enrolled clubs and registered event tickets
+  const loadUserData = useCallback(async () => {
     if (!user) return;
-    setLoading(true);
     try {
       const allClubs = await clubService.getAllClubs();
       const userClubIds = user.joinedClubs || [];
@@ -48,15 +50,13 @@ export default function StudentDashboard() {
       const userRegs = await eventService.getUserRegistrations(user._id, user.email);
       setMyRegistrations(userRegs);
     } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
+      console.error('Error loading student dashboard data', err);
     }
-  };
+  }, [user]);
 
   useEffect(() => {
     loadUserData();
-  }, [user]);
+  }, [loadUserData]);
 
   const handleOpenTicket = (reg) => {
     setSelectedTicket(reg);
@@ -66,12 +66,12 @@ export default function StudentDashboard() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-16">
       {/* Welcome Banner */}
-      <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-slate-200/90 shadow-xs">
+      <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-lg border border-slate-200 shadow-sm">
         <div className="flex items-center gap-4">
           <img
             src={user?.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80'}
             alt={user?.name}
-            className="w-14 h-14 rounded-2xl object-cover border-2 border-indigo-100"
+            className="w-14 h-14 rounded-lg object-cover border-2 border-slate-200"
           />
           <div>
             <div className="flex items-center gap-2">
@@ -136,22 +136,22 @@ export default function StudentDashboard() {
               <QuickActions mode="student" />
 
               {/* My Registered Events Passes Preview */}
-              <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs space-y-4">
+              <div className="bg-white rounded-lg border border-slate-200 p-6 space-y-4">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                    <QrCode className="w-5 h-5 text-indigo-600" />
+                  <h3 className="text-base font-semibold text-slate-900 flex items-center gap-2">
+                    <QrCode className="w-5 h-5 text-[#1e3a5f]" />
                     My Active Event Admission Passes
                   </h3>
                   <button
                     onClick={() => setActiveTab('events')}
-                    className="text-xs font-bold text-indigo-600 hover:underline flex items-center gap-1"
+                    className="text-xs font-medium text-[#1e3a5f] hover:underline flex items-center gap-1"
                   >
                     View all ({myRegistrations.length}) <ArrowRight className="w-3.5 h-3.5" />
                   </button>
                 </div>
 
                 {myRegistrations.length === 0 ? (
-                  <div className="p-8 text-center bg-slate-50 rounded-xl border border-slate-100">
+                  <div className="p-8 text-center bg-slate-50 rounded-md border border-slate-200">
                     <p className="text-xs text-slate-500">You haven't registered for any events yet.</p>
                     <Link to="/events" className="mt-2 inline-block">
                       <Button size="sm" variant="outline">
@@ -164,31 +164,31 @@ export default function StudentDashboard() {
                     {myRegistrations.slice(0, 2).map((reg) => (
                       <div
                         key={reg._id}
-                        className="bg-slate-900 text-white p-4 rounded-xl border border-slate-800 flex flex-col justify-between"
+                        className="bg-[#1e3a5f] text-white p-5 rounded-lg border border-[#2c5282] flex flex-col justify-between"
                       >
                         <div>
                           <div className="flex items-center justify-between">
-                            <span className="text-[10px] uppercase font-bold text-indigo-400">
+                            <span className="text-[11px] uppercase font-semibold text-amber-300">
                               Pass #{reg.ticketNumber}
                             </span>
                             <Badge variant="success" size="sm">
                               Confirmed
                             </Badge>
                           </div>
-                          <h4 className="text-sm font-bold text-white mt-1 line-clamp-1">
+                          <h4 className="text-sm font-semibold text-white mt-2 line-clamp-1">
                             {reg.eventTitle}
                           </h4>
-                          <p className="text-xs text-slate-400 mt-1">
+                          <p className="text-xs text-slate-300 mt-1">
                             {formatDate(reg.eventDate)} • {formatTime(reg.eventTime)}
                           </p>
-                          <p className="text-xs text-slate-300 mt-0.5 truncate">{reg.eventVenue}</p>
+                          <p className="text-xs text-slate-200 mt-0.5 truncate">{reg.eventVenue}</p>
                         </div>
 
-                        <div className="mt-4 pt-3 border-t border-slate-800 flex items-center justify-between">
-                          <span className="text-[11px] text-slate-400">QR Ready</span>
+                        <div className="mt-4 pt-3 border-t border-white/20 flex items-center justify-between">
+                          <span className="text-[11px] text-slate-300">QR Ready</span>
                           <Button
                             size="sm"
-                            variant="primary"
+                            variant="secondary"
                             icon={QrCode}
                             onClick={() => handleOpenTicket(reg)}
                           >
@@ -217,7 +217,7 @@ export default function StudentDashboard() {
                 </div>
 
                 {joinedClubsList.length === 0 ? (
-                  <div className="bg-white p-8 rounded-2xl border border-slate-200 text-center">
+                  <div className="bg-white p-8 rounded-lg border border-slate-200 text-center">
                     <p className="text-xs text-slate-500">You haven't joined any clubs yet.</p>
                     <Link to="/clubs" className="mt-2 inline-block">
                       <Button size="sm" variant="outline">
@@ -254,9 +254,9 @@ export default function StudentDashboard() {
               </div>
 
               {joinedClubsList.length === 0 ? (
-                <div className="bg-white p-12 rounded-2xl border border-slate-200 text-center space-y-3">
+                <div className="bg-white p-12 rounded-lg border border-slate-200 text-center space-y-3">
                   <Users className="w-8 h-8 mx-auto text-slate-300" />
-                  <p className="text-sm font-bold text-slate-700">No joined clubs</p>
+                  <p className="text-sm font-semibold text-slate-700">No joined clubs</p>
                   <p className="text-xs text-slate-500 max-w-sm mx-auto">
                     Join technical coding societies, cultural groups, or athletic teams to stay
                     connected with meetings and initiatives.
@@ -295,9 +295,9 @@ export default function StudentDashboard() {
               </div>
 
               {myRegistrations.length === 0 ? (
-                <div className="bg-white p-12 rounded-2xl border border-slate-200 text-center space-y-3">
+                <div className="bg-white p-12 rounded-lg border border-slate-200 text-center space-y-3">
                   <Ticket className="w-8 h-8 mx-auto text-slate-300" />
-                  <p className="text-sm font-bold text-slate-700">No registered events yet</p>
+                  <p className="text-sm font-semibold text-slate-700">No registered events yet</p>
                   <p className="text-xs text-slate-500 max-w-sm mx-auto">
                     Register for upcoming hackathons, workshops, and fests to generate your official
                     e-tickets.
@@ -309,15 +309,15 @@ export default function StudentDashboard() {
                   </Link>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {myRegistrations.map((reg) => (
                     <div
                       key={reg._id}
-                      className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 space-y-4 hover:border-slate-300 transition-all flex flex-col justify-between"
+                      className="bg-white rounded-lg border border-slate-200 shadow-sm p-5 space-y-4 hover:border-slate-300 transition-all flex flex-col justify-between"
                     >
                       <div>
                         <div className="flex items-center justify-between">
-                          <span className="font-mono text-xs font-bold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-md">
+                          <span className="font-mono text-xs font-semibold text-[#1e3a5f] bg-[#1e3a5f]/5 px-2 py-0.5 rounded">
                             {reg.ticketNumber}
                           </span>
                           <Badge variant="success" size="sm" dot>
@@ -325,7 +325,7 @@ export default function StudentDashboard() {
                           </Badge>
                         </div>
 
-                        <h3 className="text-base font-bold text-slate-900 mt-2">
+                        <h3 className="text-base font-semibold text-slate-900 mt-2">
                           {reg.eventTitle}
                         </h3>
 
@@ -337,7 +337,7 @@ export default function StudentDashboard() {
                       </div>
 
                       <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
-                        <span className="text-[11px] text-slate-400">
+                        <span className="text-[11px] text-slate-500">
                           Booked {formatDate(reg.registeredAt)}
                         </span>
                         <Button

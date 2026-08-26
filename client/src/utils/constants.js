@@ -3,14 +3,40 @@ export const USER_ROLES = {
   ADMIN: 'admin',
 };
 
+export const DATA_SEED_VERSION = 'official-clubs-v2';
+
 export const CLUB_CATEGORIES = [
+  'All',
+  'Hostel Committee',
+  'Art and Craft',
+  'Entrepreneurship',
+  'Day Scholar',
+  'Health',
+  'LinkedIn Club',
+  'Cooking',
+  'Technical',
+  'Wellness',
+  'Content Creation',
+  'Film Making',
+  'Literature',
+  'Poetry',
+  'Placement',
+  'Theatre',
+  'Singing',
+  'Dance',
+  'Sports',
+];
+
+export const EVENT_CATEGORIES = [
   'All',
   'Technical',
   'Cultural',
   'Sports',
-  'Arts',
-  'Social & Welfare',
-  'Literary',
+  'Entrepreneurship',
+  'Health',
+  'Professional',
+  'Media',
+  'Culinary',
 ];
 
 export const ANNOUNCEMENT_PRIORITIES = {
@@ -29,8 +55,8 @@ export const DEMO_USERS = {
     rollNo: '2310990001',
     department: 'Computer Science & Engineering',
     semester: '4th Semester',
-    joinedClubs: ['club_01', 'club_03'],
-    registeredEvents: ['evt_01', 'evt_03'],
+    joinedClubs: ['club_08', 'club_18', 'club_06'],
+    registeredEvents: ['evt_01', 'evt_03', 'evt_07'],
     avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
   },
   ADMIN: {
@@ -51,4 +77,5 @@ export const STORAGE_KEYS = {
   EVENTS: 'cc_events_data',
   ANNOUNCEMENTS: 'cc_announcements_data',
   REGISTRATIONS: 'cc_registrations_data',
+  DATA_VERSION: 'cc_data_seed_version',
 };

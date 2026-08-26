@@ -4,6 +4,7 @@ import { useAuth } from '../../hooks/useAuth';
 import { useAlert } from '../../hooks/useAlert';
 import Input from '../common/Input';
 import Button from '../common/Button';
+import Badge from '../common/Badge';
 import { Mail, Lock, Shield, GraduationCap, ArrowRight, Sparkles } from 'lucide-react';
 import { validateEmail, validatePassword } from '../../utils/validators';
 import { DEMO_USERS, USER_ROLES } from '../../utils/constants';
@@ -76,24 +77,23 @@ export default function LoginForm() {
   };
 
   return (
-    <div className="w-full max-w-md mx-auto">
-      {/* 1-Click Demo Login Panel */}
-      <div className="mb-6 p-4 bg-gradient-to-br from-indigo-50/90 to-slate-50 border border-indigo-100 rounded-2xl">
-        <div className="flex items-center gap-2 mb-2 text-xs font-bold text-indigo-900 uppercase tracking-wider">
-          <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
+    <div className="w-full max-w-md mx-auto bg-white border border-slate-200 rounded-xl p-6 sm:p-8 shadow-lg">
+      <div className="mb-6 p-4 bg-slate-50 border border-slate-200 rounded-lg">
+        <div className="flex items-center gap-2 mb-2 text-xs font-semibold text-slate-700 uppercase tracking-wider">
+          <Sparkles className="w-3.5 h-3.5 text-amber-600" />
           Quick Demo Access (1-Click)
         </div>
-        <p className="text-xs text-slate-600 mb-3">
+        <p className="text-xs text-slate-500 mb-3">
           For evaluation & live testing, click a preset role to sign in immediately:
         </p>
         <div className="grid grid-cols-2 gap-2">
           <button
             type="button"
             onClick={() => handleQuickDemo(USER_ROLES.STUDENT)}
-            className="flex flex-col items-start p-2.5 bg-white border border-indigo-200/80 rounded-xl hover:border-indigo-500 hover:shadow-xs transition-all text-left cursor-pointer group"
+            className="flex flex-col items-start p-2.5 bg-white border border-slate-200 rounded-md hover:border-[#1e3a5f] hover:bg-[#1e3a5f]/5 transition-colors text-left cursor-pointer group"
           >
-            <div className="flex items-center gap-1.5 text-xs font-bold text-slate-900 group-hover:text-indigo-600">
-              <GraduationCap className="w-4 h-4 text-indigo-600" />
+            <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-900 group-hover:text-[#1e3a5f]">
+              <GraduationCap className="w-4 h-4 text-[#1e3a5f]" />
               Student Demo
             </div>
             <span className="text-[11px] text-slate-500 mt-0.5">Aarav (Roll 231099)</span>
@@ -102,10 +102,10 @@ export default function LoginForm() {
           <button
             type="button"
             onClick={() => handleQuickDemo(USER_ROLES.ADMIN)}
-            className="flex flex-col items-start p-2.5 bg-white border border-purple-200/80 rounded-xl hover:border-purple-500 hover:shadow-xs transition-all text-left cursor-pointer group"
+            className="flex flex-col items-start p-2.5 bg-white border border-slate-200 rounded-md hover:border-[#1e3a5f] hover:bg-[#1e3a5f]/5 transition-colors text-left cursor-pointer group"
           >
-            <div className="flex items-center gap-1.5 text-xs font-bold text-slate-900 group-hover:text-purple-600">
-              <Shield className="w-4 h-4 text-purple-600" />
+            <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-900 group-hover:text-[#1e3a5f]">
+              <Shield className="w-4 h-4 text-purple-700" />
               Faculty / Admin
             </div>
             <span className="text-[11px] text-slate-500 mt-0.5">Dr. Rajesh Verma</span>
@@ -115,13 +115,12 @@ export default function LoginForm() {
 
       <div className="relative flex py-2 items-center mb-6">
         <div className="flex-grow border-t border-slate-200"></div>
-        <span className="flex-shrink mx-4 text-xs font-medium text-slate-600 uppercase">
+        <span className="flex-shrink mx-4 text-xs font-medium text-slate-400 uppercase">
           Or sign in with email
         </span>
         <div className="flex-grow border-t border-slate-200"></div>
       </div>
 
-      {/* Manual Login Form */}
       <form onSubmit={handleSubmit} className="space-y-4">
         <Input
           label="College Email"
@@ -152,11 +151,18 @@ export default function LoginForm() {
             <input
               type="checkbox"
               defaultChecked
-              className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+              className="rounded border-slate-300 bg-white text-[#1e3a5f] focus:ring-[#1e3a5f]"
             />
             Remember me
           </label>
-          <a href="#forgot" onClick={(e) => { e.preventDefault(); showToast('Demo mode: Use password "chitkara123" or 1-Click login', 'info'); }} className="text-indigo-600 hover:underline">
+          <a
+            href="#forgot"
+            onClick={(e) => {
+              e.preventDefault();
+              showToast('Demo mode: Use password "chitkara123" or 1-Click login', 'info');
+            }}
+            className="text-[#1e3a5f] font-semibold hover:underline"
+          >
             Forgot password?
           </a>
         </div>
@@ -173,9 +179,9 @@ export default function LoginForm() {
         </Button>
       </form>
 
-      <p className="mt-6 text-center text-xs text-slate-600">
+      <p className="mt-6 text-center text-xs text-slate-500">
         Don't have an account yet?{' '}
-        <Link to="/register" className="text-indigo-600 font-bold hover:underline">
+        <Link to="/register" className="text-[#1e3a5f] font-semibold hover:underline">
           Register here
         </Link>
       </p>

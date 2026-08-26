@@ -1,11 +1,27 @@
 import api, { storageHelper } from './api';
 import { STORAGE_KEYS } from '../utils/constants';
+import { INITIAL_CLUBS } from '../data/initialData';
+
+const OFFICIAL_CLUB_NAMES = new Set(INITIAL_CLUBS.map((club) => club.name));
+
+function usesOfficialClubNames(clubs) {
+  return Array.isArray(clubs) && clubs.every((club) => OFFICIAL_CLUB_NAMES.has(club.name));
+}
 
 export const clubService = {
   getAllClubs: async (filters = {}) => {
     try {
       const res = await api.get('/clubs', { params: filters });
-      return res.data;
+      const clubsFromApi = res.data;
+      const unfiltered =
+        (!filters.category || filters.category === 'All') && !filters.search;
+      if (
+        !usesOfficialClubNames(clubsFromApi) ||
+        (unfiltered && clubsFromApi.length !== INITIAL_CLUBS.length)
+      ) {
+        throw new Error('Stale club payload');
+      }
+      return clubsFromApi;
     } catch {
       let clubs = storageHelper.get(STORAGE_KEYS.CLUBS);
 
@@ -31,6 +47,9 @@ export const clubService = {
   getClubById: async (id) => {
     try {
       const res = await api.get(`/clubs/${id}`);
+      if (!res.data || !OFFICIAL_CLUB_NAMES.has(res.data.name)) {
+        throw new Error('Stale club payload');
+      }
       return res.data;
     } catch {
       const clubs = storageHelper.get(STORAGE_KEYS.CLUBS);

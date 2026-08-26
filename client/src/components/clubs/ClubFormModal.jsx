@@ -6,25 +6,28 @@ import { useAlert } from '../../hooks/useAlert';
 import { clubService } from '../../services/clubService';
 import { CLUB_CATEGORIES } from '../../utils/constants';
 
+const INITIAL_CLUB_FORM = {
+  name: '',
+  category: 'Technical',
+  tagline: '',
+  description: '',
+  leadCoordinator: '',
+  facultyAdvisor: '',
+  email: '',
+  meetingSchedule: '',
+  bannerImage: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800&auto=format&fit=crop&q=80',
+  logo: '💻',
+  tags: 'Innovation, Campus',
+};
+
+/**
+ * ClubFormModal provides an administrative dialog to register new campus clubs
+ * or modify existing club coordinators, descriptions, tags, and meeting schedules.
+ */
 export default function ClubFormModal({ isOpen, onClose, clubToEdit, onSaved }) {
   const { showToast } = useAlert();
   const [loading, setLoading] = useState(false);
-
-  const initialForm = {
-    name: '',
-    category: 'Technical',
-    tagline: '',
-    description: '',
-    leadCoordinator: '',
-    facultyAdvisor: '',
-    email: '',
-    meetingSchedule: '',
-    bannerImage: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800&auto=format&fit=crop&q=80',
-    logo: '💻',
-    tags: 'Innovation, Campus',
-  };
-
-  const [formData, setFormData] = useState(initialForm);
+  const [formData, setFormData] = useState(INITIAL_CLUB_FORM);
 
   useEffect(() => {
     if (clubToEdit) {
@@ -33,7 +36,7 @@ export default function ClubFormModal({ isOpen, onClose, clubToEdit, onSaved }) 
         tags: Array.isArray(clubToEdit.tags) ? clubToEdit.tags.join(', ') : clubToEdit.tags || '',
       });
     } else {
-      setFormData(initialForm);
+      setFormData(INITIAL_CLUB_FORM);
     }
   }, [clubToEdit, isOpen]);
 
@@ -99,7 +102,7 @@ export default function ClubFormModal({ isOpen, onClose, clubToEdit, onSaved }) 
             <Input
               label="Club Name"
               name="name"
-              placeholder="e.g. ByteCraft Developers Society"
+              placeholder="e.g. TeChitkara"
               value={formData.name}
               onChange={handleChange}
               required

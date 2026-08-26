@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { useAlert } from '../hooks/useAlert';
 import { clubService } from '../services/clubService';
@@ -23,14 +23,18 @@ import {
   Users,
   Calendar,
   Ticket,
-  Bell,
   Edit2,
   Trash2,
-  ExternalLink,
-  Sparkles,
 } from 'lucide-react';
 import { formatDate, formatTime } from '../utils/formatDate';
 
+/**
+ * AdminDashboard provides faculty advisors and Dean of Student Affairs with:
+ * 1. KPI analytics (total clubs, events, registrations, memberships)
+ * 2. Club Portfolio CRUD (create, update, delete)
+ * 3. Event Scheduling CRUD & Live Attendee Rosters with CSV download
+ * 4. Campus-wide Notice Broadcasting & deletion
+ */
 export default function AdminDashboard() {
   const { user } = useAuth();
   const { showToast } = useAlert();
@@ -40,9 +44,8 @@ export default function AdminDashboard() {
   const [events, setEvents] = useState([]);
   const [announcements, setAnnouncements] = useState([]);
   const [registrations, setRegistrations] = useState([]);
-  const [loading, setLoading] = useState(true);
 
-  // Modals
+  // Modal visibility states
   const [clubModalOpen, setClubModalOpen] = useState(false);
   const [selectedClubToEdit, setSelectedClubToEdit] = useState(null);
 
@@ -51,8 +54,8 @@ export default function AdminDashboard() {
 
   const [noticeModalOpen, setNoticeModalOpen] = useState(false);
 
-  const loadAdminData = async () => {
-    setLoading(true);
+  // Fetch complete campus data for administrative overview
+  const loadAdminData = useCallback(async () => {
     try {
       const [c, e, a] = await Promise.all([
         clubService.getAllClubs(),
@@ -63,7 +66,7 @@ export default function AdminDashboard() {
       setEvents(e);
       setAnnouncements(a);
 
-      // Collect all attendee registrations across events
+      // Aggregate all attendee registrations across all events
       const allRegs = [];
       for (const ev of e) {
         const attendees = await eventService.getEventAttendees(ev._id);
@@ -71,15 +74,13 @@ export default function AdminDashboard() {
       }
       setRegistrations(allRegs);
     } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
+      console.error('Error loading admin dashboard data', err);
     }
-  };
+  }, []);
 
   useEffect(() => {
     loadAdminData();
-  }, []);
+  }, [loadAdminData]);
 
   // Club Handlers
   const handleCreateClub = () => {
@@ -147,12 +148,12 @@ export default function AdminDashboard() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-16">
       {/* Welcome & Admin Status Banner */}
-      <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-slate-200/90 shadow-xs">
+      <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-lg border border-slate-200 shadow-sm">
         <div className="flex items-center gap-4">
           <img
             src={user?.avatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&auto=format&fit=crop&q=80'}
             alt={user?.name}
-            className="w-14 h-14 rounded-2xl object-cover border-2 border-purple-100"
+            className="w-14 h-14 rounded-lg object-cover border-2 border-slate-200"
           />
           <div>
             <div className="flex items-center gap-2">
@@ -257,11 +258,11 @@ export default function AdminDashboard() {
               </div>
 
               {/* Clubs Management Table */}
-              <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+              <div className="bg-white rounded-lg border border-slate-200 overflow-hidden">
                 <div className="overflow-x-auto">
                   <table className="w-full text-left text-xs">
                     <thead>
-                      <tr className="bg-slate-50 border-b border-slate-200/80 text-slate-600 font-semibold uppercase tracking-wider text-[11px]">
+                      <tr className="bg-slate-50 border-b border-slate-200 text-slate-600 font-semibold uppercase tracking-wider text-[11px]">
                         <th className="py-3.5 px-6">Club Name & Category</th>
                         <th className="py-3.5 px-6">Student Coordinator</th>
                         <th className="py-3.5 px-6">Faculty Advisor</th>
@@ -276,7 +277,7 @@ export default function AdminDashboard() {
                             <div className="flex items-center gap-3">
                               <span className="text-2xl">{c.logo || '🎓'}</span>
                               <div>
-                                <span className="font-bold text-slate-900">{c.name}</span>
+                                <span className="font-semibold text-slate-900">{c.name}</span>
                                 <div className="mt-0.5">
                                   <Badge variant="primary" size="sm">
                                     {c.category}
@@ -287,21 +288,21 @@ export default function AdminDashboard() {
                           </td>
                           <td className="py-3.5 px-6">{c.leadCoordinator || 'N/A'}</td>
                           <td className="py-3.5 px-6 text-slate-500">{c.facultyAdvisor || 'N/A'}</td>
-                          <td className="py-3.5 px-6 font-bold text-slate-900">
+                          <td className="py-3.5 px-6 font-semibold text-slate-900">
                             {c.membersCount || 0}
                           </td>
                           <td className="py-3.5 px-6 text-right">
                             <div className="flex items-center justify-end gap-2">
                               <button
                                 onClick={() => handleEditClub(c)}
-                                className="p-1.5 rounded-lg text-slate-500 hover:text-indigo-600 hover:bg-slate-100 transition-colors cursor-pointer"
+                                className="p-1.5 rounded-md text-slate-500 hover:text-[#1e3a5f] hover:bg-slate-100 transition-colors cursor-pointer"
                                 title="Edit club"
                               >
                                 <Edit2 className="w-4 h-4" />
                               </button>
                               <button
                                 onClick={() => handleDeleteClub(c._id, c.name)}
-                                className="p-1.5 rounded-lg text-slate-500 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
+                                className="p-1.5 rounded-md text-slate-500 hover:text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
                                 title="Delete club"
                               >
                                 <Trash2 className="w-4 h-4" />
@@ -333,14 +334,14 @@ export default function AdminDashboard() {
               </div>
 
               {/* Events List Table */}
-              <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
-                <div className="p-4 bg-slate-50 border-b border-slate-200/80 font-bold text-xs text-slate-700">
+              <div className="bg-white rounded-lg border border-slate-200 overflow-hidden">
+                <div className="p-4 bg-slate-50 border-b border-slate-200 font-semibold text-xs text-slate-700">
                   Published Events
                 </div>
                 <div className="overflow-x-auto">
                   <table className="w-full text-left text-xs">
                     <thead>
-                      <tr className="border-b border-slate-200/80 text-slate-600 font-semibold uppercase tracking-wider text-[11px]">
+                      <tr className="border-b border-slate-200 text-slate-600 font-semibold uppercase tracking-wider text-[11px]">
                         <th className="py-3.5 px-6">Event Title & Host</th>
                         <th className="py-3.5 px-6">Date & Time</th>
                         <th className="py-3.5 px-6">Venue</th>
@@ -352,29 +353,29 @@ export default function AdminDashboard() {
                       {events.map((evt) => (
                         <tr key={evt._id} className="hover:bg-slate-50/70 transition-colors">
                           <td className="py-3.5 px-6">
-                            <div className="font-bold text-slate-900">{evt.title}</div>
-                            <div className="text-[11px] text-indigo-600 font-medium">{evt.clubName}</div>
+                            <div className="font-semibold text-slate-900">{evt.title}</div>
+                            <div className="text-[11px] text-[#1e3a5f] font-medium">{evt.clubName}</div>
                           </td>
                           <td className="py-3.5 px-6 text-slate-600">
                             {formatDate(evt.date)} • {formatTime(evt.time)}
                           </td>
                           <td className="py-3.5 px-6 text-slate-600">{evt.venue}</td>
                           <td className="py-3.5 px-6">
-                            <span className="font-bold text-slate-900">{evt.registeredCount || 0}</span>
+                            <span className="font-semibold text-slate-900">{evt.registeredCount || 0}</span>
                             <span className="text-slate-400"> / {evt.capacity || 100}</span>
                           </td>
                           <td className="py-3.5 px-6 text-right">
                             <div className="flex items-center justify-end gap-2">
                               <button
                                 onClick={() => handleEditEvent(evt)}
-                                className="p-1.5 rounded-lg text-slate-500 hover:text-indigo-600 hover:bg-slate-100 transition-colors cursor-pointer"
+                                className="p-1.5 rounded-md text-slate-500 hover:text-[#1e3a5f] hover:bg-slate-100 transition-colors cursor-pointer"
                                 title="Edit event"
                               >
                                 <Edit2 className="w-4 h-4" />
                               </button>
                               <button
                                 onClick={() => handleDeleteEvent(evt._id, evt.title)}
-                                className="p-1.5 rounded-lg text-slate-500 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
+                                className="p-1.5 rounded-md text-slate-500 hover:text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
                                 title="Delete event"
                               >
                                 <Trash2 className="w-4 h-4" />

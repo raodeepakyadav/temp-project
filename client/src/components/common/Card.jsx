@@ -12,19 +12,19 @@ export default function Card({
   return (
     <div
       onClick={onClick}
-      className={`bg-white rounded-2xl border border-slate-200/90 shadow-sm shadow-slate-100 overflow-hidden ${
+      className={`bg-white rounded-lg border border-slate-200 text-slate-800 overflow-hidden ${
         hoverable ? 'card-hover cursor-pointer' : ''
       } ${className}`}
       {...props}
     >
       {header && (
-        <div className="px-6 py-4 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
+        <div className="px-5 py-3 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
           {header}
         </div>
       )}
-      <div className="p-6">{children}</div>
+      <div className="p-5">{children}</div>
       {footer && (
-        <div className="px-6 py-4 border-t border-slate-100 bg-slate-50/40">
+        <div className="px-5 py-3 border-t border-slate-200 bg-slate-50">
           {footer}
         </div>
       )}

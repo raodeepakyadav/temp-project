@@ -2,18 +2,37 @@
 
 @layer base {
   :root {
-    --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    --color-primary: #1e3a5f;
+    --color-primary-light: #2c5282;
+    --color-primary-dark: #152a45;
+    --color-accent: #8b6914;
+    --color-accent-light: #a67c00;
+    --color-bg: #f5f7fa;
+    --color-surface: #ffffff;
+    --color-border: #d9dee5;
+    --color-border-muted: #e8ecf1;
+    --color-text: #1a202c;
+    --color-text-muted: #4a5568;
+    --color-text-subtle: #718096;
   }
 
   * {
-    border-color: #E2E8F0;
+    border-color: var(--color-border);
+  }
+
+  html {
+    scroll-behavior: smooth;
   }
 
   body {
     font-family: var(--font-sans);
-    color: #0F172A;
-    background-color: #F8FAFC;
-    overflow-x: hidden;
+    color: var(--color-text);
+    background-color: var(--color-bg);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    line-height: 1.6;
+    font-size: 14px;
   }
 
   #root {
@@ -21,44 +40,76 @@
     display: flex;
     flex-direction: column;
   }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-weight: 600;
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+    color: var(--color-text);
+  }
+
+  p {
+    color: var(--color-text-muted);
+  }
 }
 
-/* Custom subtle scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 8px;
+  height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #F1F5F9;
+  background: #f1f5f9;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #CBD5E1;
-  border-radius: 9999px;
+  background: #cbd5e0;
+  border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #94A3B8;
-}
-
-/* Custom interactive classes */
-.glass-panel {
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(226, 232, 240, 0.8);
-}
-
-.subtle-ring {
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05), 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+  background: #a0aec0;
 }
 
 .card-hover {
-  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .card-hover:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.06), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
-  border-color: #CBD5E1;
+  border-color: #c0c8d3;
+  box-shadow: 0 2px 8px -2px rgba(26, 32, 44, 0.06);
+}
+
+.campus-bg {
+  position: relative;
+  background-color: #f5f7fa;
+}
+
+.campus-bg.page-bg {
+  background-image: url('/image.png');
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+.campus-bg.page-bg::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-color: rgba(245, 247, 250, 0.96);
+  backdrop-filter: blur(3px);
+}
+
+.campus-bg > * {
+  position: relative;
+  z-index: 1;
+}
+
+*:focus-visible {
+  outline: 2px solid var(--color-primary-light);
+  outline-offset: 2px;
+  border-radius: 3px;
 }

@@ -3,22 +3,29 @@ import { eventService } from '../../services/eventService';
 import Badge from '../common/Badge';
 import Button from '../common/Button';
 import { SkeletonRow } from '../common/Loader';
-import { Download, Search, Users, CheckCircle2, QrCode } from 'lucide-react';
+import { Download, Search, Users } from 'lucide-react';
 import { formatDate, formatTime } from '../../utils/formatDate';
 
+/**
+ * RegistrationTable displays live attendee lists for events.
+ * Includes search filtering by roll/name, and 1-click CSV export for coordinators.
+ */
 export default function RegistrationTable({ selectedEventId, events = [] }) {
-  const [currentEventId, setCurrentEventId] = useState(selectedEventId || (events[0]?._id ?? ''));
+  const [currentEventId, setCurrentEventId] = useState(
+    selectedEventId || (events.length > 0 ? events[0]._id : '')
+  );
   const [attendees, setAttendees] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
 
+  // Synchronize when parent changes selectedEventId or events load
   useEffect(() => {
     if (selectedEventId) {
       setCurrentEventId(selectedEventId);
     } else if (events.length > 0 && !currentEventId) {
       setCurrentEventId(events[0]._id);
     }
-  }, [selectedEventId, events]);
+  }, [selectedEventId, events, currentEventId]);
 
   useEffect(() => {
     const loadAttendees = async () => {

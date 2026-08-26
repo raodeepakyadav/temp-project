@@ -8,26 +8,34 @@ export default function StatsCard({
   icon: Icon,
   trend,
   trendPositive = true,
-  variant = 'indigo',
+  variant = 'emerald',
 }) {
   const iconVariants = {
-    indigo: 'bg-indigo-50 text-indigo-600',
-    purple: 'bg-purple-50 text-purple-600',
-    emerald: 'bg-emerald-50 text-emerald-600',
-    amber: 'bg-amber-50 text-amber-600',
+    emerald: 'bg-emerald-50 text-emerald-700 border border-emerald-100',
+    blue: 'bg-blue-50 text-blue-700 border border-blue-100',
+    amber: 'bg-amber-50 text-amber-700 border border-amber-100',
+    rose: 'bg-rose-50 text-rose-700 border border-rose-100',
+    indigo: 'bg-[#1e3a5f]/10 text-[#1e3a5f] border border-[#1e3a5f]/20',
+    purple: 'bg-purple-50 text-purple-700 border border-purple-100',
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-xs flex flex-col justify-between transition-all hover:border-slate-300">
+    <div className="bg-white rounded-md border border-slate-200 p-5 flex flex-col justify-between transition-colors hover:border-slate-300">
       <div className="flex items-start justify-between">
         <div>
-          <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">{title}</p>
-          <h3 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1 tracking-tight">
+          <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+            {title}
+          </p>
+          <h3 className="text-2xl sm:text-3xl font-semibold text-slate-900 mt-1 tracking-tight">
             {value}
           </h3>
         </div>
         {Icon && (
-          <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${iconVariants[variant] || iconVariants.indigo}`}>
+          <div
+            className={`w-10 h-10 rounded-md flex items-center justify-center ${
+              iconVariants[variant] || iconVariants.indigo
+            }`}
+          >
             <Icon className="w-5 h-5" />
           </div>
         )}
@@ -38,7 +46,7 @@ export default function StatsCard({
           {subtitle && <span className="text-slate-500 font-medium">{subtitle}</span>}
           {trend && (
             <span
-              className={`inline-flex items-center gap-0.5 font-bold ${
+              className={`inline-flex items-center gap-0.5 font-semibold ${
                 trendPositive ? 'text-emerald-600' : 'text-rose-600'
               }`}
             >

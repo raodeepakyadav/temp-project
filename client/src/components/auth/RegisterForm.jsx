@@ -97,21 +97,20 @@ export default function RegisterForm() {
   };
 
   return (
-    <div className="w-full max-w-lg mx-auto">
+    <div className="w-full max-w-lg mx-auto bg-white border border-slate-200 rounded-xl p-6 sm:p-8 shadow-lg">
       <form onSubmit={handleSubmit} className="space-y-4">
-        {/* Role Toggle Selector */}
         <div>
           <label className="text-xs font-semibold text-slate-700 block mb-1.5">
-            Register As <span className="text-rose-500">*</span>
+            Register As <span className="text-red-500">*</span>
           </label>
           <div className="grid grid-cols-2 gap-3">
             <button
               type="button"
               onClick={() => setFormData((prev) => ({ ...prev, role: USER_ROLES.STUDENT }))}
-              className={`p-3 rounded-xl border text-sm font-semibold transition-all cursor-pointer ${
+              className={`p-3 rounded-md border text-sm font-semibold transition-colors cursor-pointer ${
                 formData.role === USER_ROLES.STUDENT
-                  ? 'border-indigo-600 bg-indigo-50/70 text-indigo-700'
-                  : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
+                  ? 'border-[#1e3a5f] bg-[#1e3a5f]/10 text-[#1e3a5f]'
+                  : 'border-slate-200 bg-slate-50 text-slate-500 hover:bg-white hover:border-slate-300'
               }`}
             >
               🎓 Student
@@ -119,10 +118,10 @@ export default function RegisterForm() {
             <button
               type="button"
               onClick={() => setFormData((prev) => ({ ...prev, role: USER_ROLES.ADMIN }))}
-              className={`p-3 rounded-xl border text-sm font-semibold transition-all cursor-pointer ${
+              className={`p-3 rounded-md border text-sm font-semibold transition-colors cursor-pointer ${
                 formData.role === USER_ROLES.ADMIN
-                  ? 'border-purple-600 bg-purple-50/70 text-purple-700'
-                  : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
+                  ? 'border-[#1e3a5f] bg-[#1e3a5f]/10 text-[#1e3a5f]'
+                  : 'border-slate-200 bg-slate-50 text-slate-500 hover:bg-white hover:border-slate-300'
               }`}
             >
               🛡️ Faculty / Club Lead
@@ -224,9 +223,9 @@ export default function RegisterForm() {
         </Button>
       </form>
 
-      <p className="mt-6 text-center text-xs text-slate-600">
+      <p className="mt-6 text-center text-xs text-slate-500">
         Already registered?{' '}
-        <Link to="/login" className="text-indigo-600 font-bold hover:underline">
+        <Link to="/login" className="text-[#1e3a5f] font-semibold hover:underline">
           Sign In
         </Link>
       </p>

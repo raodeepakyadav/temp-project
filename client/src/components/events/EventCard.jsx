@@ -13,12 +13,11 @@ import {
   CheckCircle2,
   Ticket,
   ArrowRight,
-  Sparkles,
 } from 'lucide-react';
 import { formatDate, formatTime } from '../../utils/formatDate';
 
 export default function EventCard({ event, onEventUpdated, onSelectEvent }) {
-  const { user, isAuthenticated, isStudent, updateUserProfile } = useAuth();
+  const { user, isAuthenticated, updateUserProfile } = useAuth();
   const { showToast } = useAlert();
 
   const [loading, setLoading] = useState(false);
@@ -26,13 +25,38 @@ export default function EventCard({ event, onEventUpdated, onSelectEvent }) {
   const [generatedTicket, setGeneratedTicket] = useState(null);
 
   const isRegistered =
-    user?.registeredEvents?.includes(event._id) ||
-    event.userRegistered;
+    user?.registeredEvents?.includes(event._id) || event.userRegistered;
 
   const capacity = event.capacity || 100;
   const registeredCount = event.registeredCount || 0;
   const percentFilled = Math.min(100, Math.round((registeredCount / capacity) * 100));
   const isFull = registeredCount >= capacity;
+
+  const getCategoryVariant = (cat) => {
+    switch (cat) {
+      case 'Technical':
+        return 'primary';
+      case 'Cultural':
+        return 'purple';
+      case 'Sports':
+        return 'success';
+      case 'Arts':
+        return 'cyan';
+      case 'Entrepreneurship':
+        return 'info';
+      case 'Literary':
+      case 'Culinary':
+        return 'warning';
+      case 'Hostel':
+      case 'Day Scholar':
+      case 'Health':
+      case 'Wellness':
+      case 'Media':
+      case 'Professional':
+      default:
+        return 'default';
+    }
+  };
 
   const handleRegister = async (e) => {
     e.stopPropagation();
@@ -43,7 +67,6 @@ export default function EventCard({ event, onEventUpdated, onSelectEvent }) {
     }
 
     if (isRegistered) {
-      // Find ticket and open pass
       try {
         const userRegistrations = await eventService.getUserRegistrations(user._id, user.email);
         const match = userRegistrations.find((r) => r.eventId === event._id);
@@ -67,11 +90,10 @@ export default function EventCard({ event, onEventUpdated, onSelectEvent }) {
     setLoading(true);
     try {
       const res = await eventService.registerForEvent(event._id, user);
-      showToast('🎉 Registration confirmed! Your digital admission pass is ready.', 'success');
+      showToast('Registration confirmed! Your digital admission pass is ready.', 'success');
       setGeneratedTicket(res.registration);
       setTicketModalOpen(true);
 
-      // Update user state
       if (user) {
         const registeredEvents = [...(user.registeredEvents || []), event._id];
         updateUserProfile({ registeredEvents });
@@ -85,68 +107,48 @@ export default function EventCard({ event, onEventUpdated, onSelectEvent }) {
     }
   };
 
-  const getCategoryVariant = (cat) => {
-    switch (cat) {
-      case 'Technical':
-        return 'primary';
-      case 'Cultural':
-        return 'purple';
-      case 'Sports':
-        return 'success';
-      case 'Arts':
-        return 'cyan';
-      default:
-        return 'default';
-    }
-  };
-
   return (
     <>
       <div
         onClick={() => onSelectEvent && onSelectEvent(event)}
-        className="bg-white rounded-2xl border border-slate-200/90 shadow-sm overflow-hidden flex flex-col transition-all duration-200 hover:-translate-y-1 hover:shadow-lg hover:border-slate-300 group cursor-pointer"
+        className="bg-white rounded-lg border border-slate-200 overflow-hidden flex flex-col hover:border-slate-300 card-hover group cursor-pointer"
       >
-        {/* Banner with badging */}
-        <div className="relative h-44 w-full overflow-hidden bg-slate-100">
+        <div className="relative h-40 w-full overflow-hidden bg-slate-100">
           <img
             src={event.bannerImage}
             alt={event.title}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/20" />
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-900/55 via-slate-900/10 to-transparent" />
 
-          <div className="absolute top-3 left-3 flex items-center gap-2">
+          <div className="absolute top-2.5 left-2.5">
             <Badge variant={getCategoryVariant(event.category)} size="sm">
               {event.category}
             </Badge>
           </div>
-
-          <div className="absolute top-3 right-3 bg-black/60 backdrop-blur-md text-white px-2.5 py-1 rounded-full text-xs font-semibold border border-white/20">
+          <div className="absolute top-2.5 right-2.5 bg-white text-slate-700 px-2 py-0.5 rounded border border-slate-200 text-xs font-semibold">
             {event.fee || 'Free'}
           </div>
 
-          {/* Date Tag */}
-          <div className="absolute bottom-3 left-3 bg-white/95 backdrop-blur-md text-slate-900 px-3 py-1.5 rounded-xl text-xs font-bold shadow-sm flex items-center gap-1.5">
-            <Calendar className="w-3.5 h-3.5 text-indigo-600" />
+          <div className="absolute bottom-2.5 left-2.5 bg-white text-slate-800 border border-slate-200 px-2.5 py-1 rounded text-xs font-semibold flex items-center gap-1.5">
+            <Calendar className="w-3.5 h-3.5 text-[#1e3a5f]" />
             <span>{formatDate(event.date)}</span>
           </div>
         </div>
 
-        {/* Content */}
-        <div className="p-5 flex-1 flex flex-col justify-between">
+        <div className="p-4 flex-1 flex flex-col justify-between">
           <div>
-            <span className="text-[11px] font-bold text-indigo-600 uppercase tracking-wide">
+            <span className="text-[11px] font-bold text-[#1e3a5f] uppercase tracking-wider">
               {event.clubName}
             </span>
-            <h3 className="text-base font-bold text-slate-900 line-clamp-1 group-hover:text-indigo-600 transition-colors mt-0.5">
+            <h3 className="text-sm font-semibold text-slate-900 line-clamp-1 group-hover:text-[#1e3a5f] transition-colors mt-0.5">
               {event.title}
             </h3>
-            <p className="text-xs text-slate-500 mt-1.5 line-clamp-2 leading-relaxed">
+            <p className="text-xs text-slate-600 mt-1 line-clamp-2 leading-relaxed">
               {event.shortDescription || event.description}
             </p>
 
-            {/* Venue & Time info */}
-            <div className="mt-3 space-y-1.5 text-xs text-slate-600">
+            <div className="mt-2.5 space-y-1 text-xs text-slate-500">
               <div className="flex items-center gap-2">
                 <Clock className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
                 <span>{formatTime(event.time)}</span>
@@ -158,30 +160,30 @@ export default function EventCard({ event, onEventUpdated, onSelectEvent }) {
             </div>
           </div>
 
-          {/* Seat Capacity Bar & Actions */}
-          <div className="mt-4 pt-3 border-t border-slate-100 space-y-3">
-            {/* Seat capacity bar */}
+          <div className="mt-4 pt-3 border-t border-slate-100 space-y-2.5">
             <div>
-              <div className="flex items-center justify-between text-[11px] font-semibold text-slate-600 mb-1">
-                <span>Seats Available</span>
-                <span className={isFull ? 'text-rose-600' : 'text-slate-900'}>
-                  {registeredCount} / {capacity} ({capacity - registeredCount} left)
+              <div className="flex items-center justify-between text-[11px] font-semibold text-slate-500 mb-1">
+                <span className="flex items-center gap-1">
+                  <Users className="w-3 h-3" /> Seats
+                </span>
+                <span className={isFull ? 'text-red-600' : 'text-slate-700'}>
+                  {registeredCount} / {capacity}
                 </span>
               </div>
-              <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
+              <div className="w-full h-1.5 bg-slate-100 rounded overflow-hidden">
                 <div
-                  className={`h-full rounded-full transition-all duration-500 ${
-                    percentFilled > 85 ? 'bg-rose-500' : percentFilled > 60 ? 'bg-amber-500' : 'bg-indigo-600'
+                  className={`h-full rounded transition-all duration-500 ${
+                    percentFilled > 85 ? 'bg-red-500' : percentFilled > 60 ? 'bg-amber-500' : 'bg-emerald-600'
                   }`}
                   style={{ width: `${percentFilled}%` }}
                 />
               </div>
             </div>
 
-            <div className="flex items-center justify-between gap-2 pt-1">
+            <div className="flex items-center justify-between gap-2 pt-0.5">
               <button
                 type="button"
-                className="text-xs font-bold text-slate-600 group-hover:text-indigo-600 flex items-center gap-1"
+                className="text-xs font-semibold text-slate-500 group-hover:text-[#1e3a5f] flex items-center gap-1 transition-colors"
               >
                 Full Details <ArrowRight className="w-3.5 h-3.5" />
               </button>
@@ -201,13 +203,11 @@ export default function EventCard({ event, onEventUpdated, onSelectEvent }) {
         </div>
       </div>
 
-      {/* Ticket Pass Modal */}
       {generatedTicket && (
         <EventTicketModal
           isOpen={ticketModalOpen}
           onClose={() => setTicketModalOpen(false)}
           ticket={generatedTicket}
-          triggerConfetti={true}
         />
       )}
     </>
